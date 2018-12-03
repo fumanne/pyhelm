@@ -198,10 +198,15 @@ class ChartBuilder(object):
 
         dependencies = []
 
-        for chart in self.chart.get('dependencies', []):
-            self._logger.info("Building dependency chart %s for release %s", 
-                              chart.name, self.chart.name)
-            dependencies.append(ChartBuilder(chart).get_helm_chart())
+        if os.path.exists(os.path.join(self.source_directory, 'requirements.yaml')):
+            with open(os.path.join(self.source_directory, 'requirements.yaml')) as fd:
+                dep = yaml.load(fd.read())
+            dependencies.append(dep)
+
+        # for chart in self.chart.get('dependencies', []):
+        #     self._logger.info("Building dependency chart %s for release %s",
+        #                       chart.name, self.chart.name)
+        #     dependencies.append(ChartBuilder(chart).get_helm_chart())
 
         helm_chart = Chart(
             metadata=self.get_metadata(),
